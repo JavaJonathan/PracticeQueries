@@ -1,0 +1,26 @@
+CREATE FUNCTION dbo.ConstructCongratsEmail (@Rate INT, @PersonName VARCHAR(MAX))
+  RETURNS VARCHAR(MAX)
+  AS
+  BEGIN
+
+	RETURN 'Congratulations, ' + @PersonName + '! We have found out your pay rate it too low! Your pay rate has been increated by 1 MILLION DOLLARS! Your new rate is ' + CAST(@rate + 1000000 AS VARCHAR(MAX)) + '/hr!'
+	
+  END
+  GO
+
+WITH FindEmployeesThatDeserveRaise(BusinessEntityId, PayRate, PersonName)
+AS
+(
+	SELECT TOP 100 Person.BusinessEntityID, Rate, FirstName + ' ' + LastName
+	FROM HumanResources.EmployeePayHistory
+	JOIN Person.Person on Person.BusinessEntityID = EmployeePayHistory.BusinessEntityID
+	ORDER BY Rate DESC
+)
+
+SELECT 
+	Person.EmailAddress.EmailAddress AS [Email To], 
+	dbo.ConstructCongratsEmail(PayRate, PersonName) AS [Email Message] 
+FROM FindEmployeesThatDeserveRaise
+JOIN Person.EmailAddress ON Person.EmailAddress.BusinessEntityID = FindEmployeesThatDeserveRaise.BusinessEntityId
+
+DROP FUNCTION ConstructCongratsEmail
