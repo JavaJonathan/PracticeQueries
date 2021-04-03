@@ -5,10 +5,10 @@ CREATE FUNCTION dbo.checkIfWeHaveTheirCreditCard (@BusinessEntityId INT)
 	DECLARE @Hackable AS VARCHAR(Max)
 
 	SELECT 
-			@Hackable = CASE
-							WHEN CreditCardID IS NOT NULL THEN 'Uh Oh - we can hack them'
-							ELSE 'Good - we cannot hack them'
-						END
+		@Hackable = CASE
+				WHEN CreditCardID IS NOT NULL THEN 'Uh Oh - we can hack them'
+				ELSE 'Good - we cannot hack them'
+			    END
 	FROM sales.PersonCreditCard
 	WHERE BusinessEntityID = @BusinessEntityId
 
