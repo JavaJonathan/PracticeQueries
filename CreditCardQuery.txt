@@ -1,0 +1,31 @@
+CREATE FUNCTION dbo.checkIfWeHaveTheirCreditCard (@BusinessEntityId INT)
+  RETURNS VARCHAR(MAX)
+  AS
+  BEGIN
+	DECLARE @Hackable AS VARCHAR(Max)
+
+	SELECT 
+			@Hackable = CASE
+							WHEN CreditCardID IS NOT NULL THEN 'Uh Oh - we can hack them'
+							ELSE 'Good - we cannot hack them'
+						END
+	FROM sales.PersonCreditCard
+	WHERE BusinessEntityID = @BusinessEntityId
+
+	RETURN @Hackable
+	
+  END
+  GO
+
+  SELECT 
+	Title, 
+	FirstName, 
+	MiddleName, 
+	LastName, 
+	dbo.checkIfWeHaveTheirCreditCard(person.BusinessEntityID) AS [Hackable?] 
+  FROM person.Person
+  JOIN person.BusinessEntity ON BusinessEntity.BusinessEntityID = person.BusinessEntityID
+  JOIN person.BusinessEntityAddress ON BusinessEntityAddress.BusinessEntityID = BusinessEntity.BusinessEntityID
+  JOIN sales.PersonCreditCard ON PersonCreditCard.BusinessEntityID = Person.BusinessEntityID
+
+  DROP FUNCTION checkIfWeHaveTheirCreditCard
